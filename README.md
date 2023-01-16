@@ -20,7 +20,8 @@ For Windows
 Get a list of customer
 
 ```json
-"message": "success",
+{ 
+  "message": "success",
     "data": [
         {
             "customerId": 1,
@@ -38,6 +39,7 @@ Get a list of customer
         }
     ]
 }
+
 ```
 
 ## GET /api/customer/{id}
@@ -45,7 +47,8 @@ Get a list of customer
 Get customer information by product id
 
 ```json
-"message": "success",
+{ 
+  "message": "success",
     "data": [
         {
             "customerId": 1,
