@@ -118,7 +118,7 @@ This example is using the `curl` command line
 
 
 ```bash
-curl -X "DELETE" http://localhost:8080/api/customer/2
+curl -X "DELETE" http://localhost:8080/api/customer/1
 ```
 
 The result is:
