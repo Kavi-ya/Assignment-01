@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Customer Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <link href="style.css" rel="stylesheet"> 
+    <style>
+      /* Add some custom CSS here */
+      /* Add some media queries for responsiveness */
+      /* Media Query for Tablets */
+      @media (max-width: 768px) {
+        /* Add some CSS for tablet screens */
+      }
+
+      /* Media Query for Mobiles */
+      @media (max-width: 576px) {
+        /* Add some CSS for mobile screens */
+      }
+    </style>
+    <script>
+      $(document).ready(function () {
+        // function to get all customers
+        function getCustomers() {
+          $.ajax({
+            type: "GET",
+            url: "http://localhost:8080/api/customer",
+            success: function (data) {
+              console.log(data);
+              var rows = "";
+              $.each(data.data, function (key, value) {
+                rows += "<tr>";
+                rows += "<td>" + value.customerId + "</td>";
+                rows += "<td>" + value.name + "</td>";
+                rows += "<td>" + value.address + "</td>";
+                rows += "<td>" + value.email + "</td>";
+                rows += "<td>" + value.dateOfBirth + "</td>";
+                rows += "<td>" + value.gender + "</td>";
+                rows += "<td>" + value.age + "</td>";
+                rows += "<td>" + value.cardHolderName + "</td>";
+                rows += "<td>" + value.cardNumber + "</td>";
+                rows += "<td>" + value.expireDate + "</td>";
+                rows += "<td>" + value.cvv + "</td>";
+                rows += "<td>" + value.timeStamp + "</td>";
+                rows += "</tr>";
+              });
+              $("table tbody").html(rows);
+            },
+          });
+        }
+
+        // function to add new customer
+        function addCustomer() {
+          var customer = {
+            name: $("#name").val(),
+            address: $("#address").val(),
+            email: $("#email").val(),
+            dateOfBirth: $("#dateOfBirth").val(),
+            gender: $("#gender").val(),
+            age: $("#age").val(),
+            cardHolderName: $("#cardHolderName").val(),
+            cardNumber: $("#cardNumber").val(),
+            expireDate: $("#expireDate").val(),
+            cvv: $("#cvv").val(),
+            timeStamp: $("#timeStamp").val(),
+          };
+
+          $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/api/customer/",
+            data: customer,
+            success: function (data) {
+              console.log(data);
+              getCustomers();
+            },
+            error: function (error) {
+              console.log(error);
+            },
+          });
+        }
+
+        function updateCustomer(customerId) {
+          const name = document.getElementById("name").value;
+          const address = document.getElementById("address").value;
+          const email = document.getElementById("email").value;
+          const dateOfBirth = document.getElementById("dateOfBirth").value;
+          const gender = document.getElementById("gender").value;
+          const age = document.getElementById("age").value;
+          const cardHolderName =
+            document.getElementById("cardHolderName").value;
+          const cardNumber = document.getElementById("cardNumber").value;
+          const expiryDate = document.getElementById("expiryDate").value;
+          const cvv = document.getElementById("cvv").value;
+          const timeStamp = new Date();
+
+          // client-side validation
+          if (
+            !name ||
+            !address ||
+            !email ||
+            !dateOfBirth ||
+            !gender ||
+            !age ||
+            !cardHolderName ||
+            !cardNumber ||
+            !expiryDate ||
+            !cvv
+          ) {
+            alert("All fields are required!");
+            return;
+          }
+
+          if (!validateEmail(email)) {
+            alert("Invalid email address!");
+            return;
+          }
+
+          if (!validateCardNumber(cardNumber)) {
+            alert("Invalid credit card number!");
+            return;
+          }
+
+          // send PUT request to server
+          fetch("/api/customer/" + customerId, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              address,
+              email,
+              dateOfBirth,
+              gender,
+              age,
+              cardHolderName,
+              cardNumber,
+              expiryDate,
+              cvv,
+              timeStamp,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                alert("Customer updated successfully!");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while updating the customer.");
+            });
+        }
+
+        $(document).ready(function () {
+          $("#new-customer-form").submit(function (e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+              type: "POST",
+              url: "http://localhost:8080/api/customer",
+              data: formData,
+              success: function (response) {
+                // handle success response from server
+                alert("New customer added with ID: " + response.customerId);
+              },
+              error: function (response) {
+                // handle error response from server
+                alert("Error: " + response.error);
+              },
+            });
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <form id="new-customer-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+      <br />
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required />
+      <br />
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
+      <br />
+      <label for="dateOfBirth">Date of Birth:</label>
+      <input type="date" id="dateOfBirth" name="dateOfBirth" required />
+      <br />
+      <label for="gender">Gender:</label>
+      <select id="gender" name="gender" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+      <br />
+      <label for="age">Age:</label>
+      <input type="number" id="age" name="age" required />
+      <br />
+      <label for="cardHolderName">Card Holder Name:</label>
+      <input type="text" id="cardHolderName" name="cardHolderName" required />
+      <br />
+      <label for="cardNumber">Card Number:</label>
+      <input type="text" id="cardNumber" name="cardNumber" required />
+      <br />
+      <label for="expireDate">Expire Date:</label>
+      <input type="date" id="expireDate" name="expireDate" required />
+      <br />
+      <label for="cvv">CVV:</label>
+      <input type="number" id="cvv" name="cvv" required />
+      <br />
+      <button type="submit" class="button">Add New Customer</button>
+    </form>
+  </body>
+</html>
